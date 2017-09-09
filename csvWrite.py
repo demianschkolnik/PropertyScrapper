@@ -1,18 +1,20 @@
 import xlsxwriter
+from string import ascii_uppercase
 
-def writeTwoListsToColumns(filename,titleColumn1,titleColumn2,dataColumn1,dataColumn2):
-    workbook = xlsxwriter.Workbook(filename)
+def write(data,filename):
+    workbook = xlsxwriter.Workbook(filename+'.xlsx')
     worksheet = workbook.add_worksheet()
-    worksheet.write('A1', titleColumn1)
-    worksheet.write('B1', titleColumn2)
-    pos = 2
-    for d in dataColumn1:
-        sq = 'A' + str(pos)
-        worksheet.write(sq,d)
-        pos = pos+1
-    pos = 2
-    for d in dataColumn2:
-        sq = 'B' + str(pos)
-        worksheet.write(sq,d)
-        pos += 1
+
+    worksheet.set_column(1, 1, 40)
+    worksheet.set_column(2, 2, 20)
+
+    i = 1
+    for row in data:
+        j = 0
+        for column in row:
+            position = ascii_uppercase[j] + str(i)
+            worksheet.write(position, column)
+            j += 1
+        i += 1
+
     workbook.close()
