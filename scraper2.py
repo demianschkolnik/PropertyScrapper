@@ -9,6 +9,8 @@ import threading
 
 print(str(datetime.datetime.now()))
 
+step = 50
+
 def getInfo(subsites,master):
 
     for j in range(0, len(subsites)):
@@ -17,14 +19,16 @@ def getInfo(subsites,master):
         tree2 = html.fromstring(page2.content)
         lastRange = 25
         for i in range(1,lastRange+3):
-            codeSite = '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[1]/p[2]'
-            nameSite = '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) +']/div[2]/div/div[1]/h4/a'
-            priceSite = '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div['+ str(i) +']/div[2]/div/div[2]/p/span'
-            meterSite = '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div['+ str(i) +']/div[2]/div/div[3]/p/span'
+            codeSite =  '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[1]/p[2]'
+            nameSite =  '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[1]/h4/a'
+            priceSite = '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[2]/p/span'
+            meterSite = '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[3]/p/span'
+            typeSite =  '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[1]/p[1]/span'
             code = tree2.xpath(codeSite)
             name = tree2.xpath(nameSite)
             price = tree2.xpath(priceSite)
             meters = tree2.xpath(meterSite)
+            type = tree2.xpath(typeSite)
             if len(code) > 0:
                 aux = []
                 code = (code[0]).text
@@ -63,6 +67,8 @@ def getInfo(subsites,master):
                     maxMeters = meters
                 meanMeters = (minMeters+maxMeters)/2.0
 
+                type = type[0].text
+
                 page3 = requests.get(newLink, allow_redirects=False)
                 tree3 = html.fromstring(page3.content)
                 print(str(subsites[j]) + " " + str(j+1) + "." + str(i))
@@ -83,13 +89,41 @@ def getInfo(subsites,master):
                 else:
                     lon = -1
 
+                dormSite = '//*[@id="wrapper"]/section/div/div/div[1]/article/div/div[2]/div[2]/div[2]/div[2]/p/text()[1]'
+                dorms = tree3.xpath(dormSite)
+                if len(dorms) == 0:
+                    dormSite = '//*[@id="project-features"]/div/div/div[2]/span[2]/em'
+                    dorms = tree3.xpath(dormSite)
+
+                try:
+                    if len(dorms) > 0:
+                        dorms = dorms[0].text
+                    else:
+                        dorms = '-'
+                except AttributeError:
+                    dorms = '-'
+
+                bathSite = '//*[@id="wrapper"]/section/div/div/div[1]/article/div/div[2]/div[2]/div[2]/div[2]/p/text()[2]'
+                baths = tree3.xpath(bathSite)
+
+                try:
+                    if len(baths) > 0:
+                        baths = baths[0].text
+                    else:
+                        baths = '-'
+                except AttributeError:
+                    baths = '-'
+
                 aux.append(name)
                 aux.append(price)
                 aux.append(minMeters)
                 aux.append(maxMeters)
                 aux.append(meanMeters)
+                aux.append(type)
                 aux.append(lat)
                 aux.append(lon)
+                aux.append(dorms)
+                aux.append(baths)
                 aux.append(newLink)
                 master.append(aux)
             else:
@@ -146,12 +180,11 @@ for collectElement in collection:
     threads = []
 
     master = []
-    titles = ["id", "Nombre", "Precio", "minMet", "maxMet", "promM", "lat", "lon", "link"]
+    titles = ["id", "Nombre", "Precio", "minMet", "maxMet", "promM", "tipo", "lat", "lon", "dorms", "banios","link"]
     master.append(titles)
 
     tcounter = 0
     allLists = []
-    step = 50
     for i in range(0,len(subsites),step):
         filenameNew = fileName+"_"+str(i)
         subsites100 = subsites[i:i+step]
