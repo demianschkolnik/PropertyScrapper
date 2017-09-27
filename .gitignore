@@ -1,2 +1,18 @@
 
+<<<<<<< HEAD
 *.xml
+=======
+.idea/workspace.xml
+.idea/misc.xml
+*.pyc
+.idea/workspace.xml
+.idea/PropertyScrapper.iml
+.idea/PropertyScrapper.iml
+.idea/workspace.xml
+.idea/misc.xml
+.idea/workspace.xml
+.idea/workspace.xml
+*.xml
+*.xml
+*.iml
+>>>>>>> origin/master
