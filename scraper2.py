@@ -91,15 +91,17 @@ def getInfo(subsites,master):
 
                 dormSite = '//*[@id="wrapper"]/section/div/div/div[1]/article/div/div[2]/div[2]/div[2]/div[2]/p/text()[1]'
                 dorms = tree3.xpath(dormSite)
-                if len(dorms) == 0:
-                    dormSite = '//*[@id="project-features"]/div/div/div[2]/span[2]/em'
-                    dorms = tree3.xpath(dormSite)
 
                 try:
                     if len(dorms) > 0:
                         dorms = dorms[0].text
                     else:
-                        dorms = '-'
+                        dormSite = '//*[@id="project-features"]/div/div/div[2]/span[2]/em'
+                        dorms = tree3.xpath(dormSite)
+                        if len(dorms) > 0:
+                            dorms = dorms[0].text
+                        else:
+                            dorms = '-'
                 except AttributeError:
                     dorms = '-'
 
@@ -110,20 +112,47 @@ def getInfo(subsites,master):
                     if len(baths) > 0:
                         baths = baths[0].text
                     else:
-                        baths = '-'
+                        bathSite = '//*[@id="project-features"]/div/div/div[3]/span[2]/em'
+                        baths = tree3.xpath(bathSite)
+                        if len(baths) > 0:
+                            baths = baths[0].text
+                        else:
+                            baths = '-'
                 except AttributeError:
                     baths = '-'
+
+                dateSite = '//*[@id="wrapper"]/section/div/div/div[1]/article/div/div[2]/div[1]/div[1]/div[2]/p[2]/strong'
+                date = tree3.xpath(dateSite)
+                if len(date) > 0:
+                    date = date[0].text
+                else:
+                    date = '-'
+
+                addresSite = '//*[@id="wrapper"]/section/div/div/div[1]/article/div/div[2]/div[1]/div[2]/div[1]/div/div/p[3]/span[1]'
+                address = tree3.xpath(addresSite)
+                if len(address) == 0:
+                    addresSite = '//*[@id="wrapper"]/section/div/div/div[1]/article/div/div[2]/div[2]/div[2]/div[1]/p/span[1]'
+                    address = tree3.xpath(addresSite)
+                if len(address) > 0:
+                    try:
+                        address = address[0].text
+                    except AttributeError:
+                        address = '-'
+                else:
+                    address = '-'
 
                 aux.append(name)
                 aux.append(price)
                 aux.append(minMeters)
                 aux.append(maxMeters)
                 aux.append(meanMeters)
+                aux.append(address)
                 aux.append(type)
                 aux.append(lat)
                 aux.append(lon)
                 aux.append(dorms)
                 aux.append(baths)
+                aux.append(date)
                 aux.append(newLink)
                 master.append(aux)
             else:
@@ -180,7 +209,7 @@ for collectElement in collection:
     threads = []
 
     master = []
-    titles = ["id", "Nombre", "Precio", "minMet", "maxMet", "promM", "tipo", "lat", "lon", "dorms", "banios","link"]
+    titles = ["id", "Nombre", "Precio", "minMet", "maxMet", "promM", "direc" ,"tipo", "lat", "lon", "dorms", "banios", "fecha", "link"]
     master.append(titles)
 
     tcounter = 0
