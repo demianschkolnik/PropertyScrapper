@@ -6,6 +6,7 @@ import coordsLoc as cl
 import re
 import datetime
 import threading
+import time
 
 print(str(datetime.datetime.now()))
 
@@ -15,7 +16,7 @@ def getInfo(subsites,master):
 
     for j in range(0, len(subsites)):
         print(str(subsites[j])+ " page nr:" + str(j+1))
-        page2 = requests.get(subsites[j], allow_redirects=False)
+        page2 = requests.get(subsites[j], allow_redirects=True)
         tree2 = html.fromstring(page2.content)
         lastRange = 25
         for i in range(1,lastRange+3):
@@ -25,6 +26,11 @@ def getInfo(subsites,master):
             meterSite = '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[3]/p/span'
             typeSite =  '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[1]/p[1]/span'
             code = tree2.xpath(codeSite)
+            if len(code) == 0:
+                codeSite = '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(
+                    i) + ']/div[2]/div/div[1]/p[3]'
+                '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[1]/div[2]/div/div[1]/p[3]'
+                code = tree2.xpath(codeSite)
             name = tree2.xpath(nameSite)
             price = tree2.xpath(priceSite)
             meters = tree2.xpath(meterSite)
@@ -165,75 +171,57 @@ for n1 in ['venta','arriendo']:
         for n3 in ['arica-y-parinacota','tarapaca','antofagasta','atacama','coquimbo','bernardo-ohiggins','maule','biobio','la-araucania','de-los-rios','los-lagos','aysen','magallanes-y-antartica-chilena','valparaiso','metropolitana']:
             collection.append("http://www.portalinmobiliario.com/"+n1+"/"+n2+"/"+n3+"?tp=6&op=2&ca=3&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=1&sf=0&sp=0&pg=1")
 
+cycle = 0
+while True:
+
+    for collectElement in collection:
+
+        # TESTING
+        oneTesting = False
+        if oneTesting:
+            collectElement = 'http://www.portalinmobiliario.com/venta/departamento/metropolitana?tp=6&op=2&ca=3&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=1&sf=0&sp=0&pg=1'
+        # ENDTESTING
 
 
-for collectElement in collection:
 
-    # TESTING
-    oneTesting = False
-    if oneTesting:
-        collectElement = 'http://www.portalinmobiliario.com/venta/departamento/metropolitana?tp=6&op=2&ca=3&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=1&sf=0&sp=0&pg=1'
-    # ENDTESTING
+        print("SITE:" + collectElement)
+        page2 = requests.get(collectElement, allow_redirects=True)
+        tree2 = html.fromstring(page2.content)
 
+        paginas = tree2.xpath('//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[1]/div[1]/div/div/text()[1]')
+        if len(paginas) == 0:
+            continue
 
+        pagsplit = (str(paginas[0]).split())[2]
+        nrOfPubs = int(pagsplit.replace(".", ""))
 
-    print("SITE:" + collectElement)
-    page2 = requests.get(collectElement, allow_redirects=False)
-    tree2 = html.fromstring(page2.content)
+        nrOfPbsPerPage = 25
 
-    paginas = tree2.xpath('//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[1]/div[1]/div/div/text()[1]')
-    if len(paginas) == 0:
-        continue
+        nrPages = math.ceil(nrOfPubs/nrOfPbsPerPage)
 
-    pagsplit = (str(paginas[0]).split())[2]
-    nrOfPubs = int(pagsplit.replace(".", ""))
+        subsites = []
+        subsiteBasicUrl = (collectElement)[:-1]
+        for i in range(1,nrPages+1):
+            subsites.append(subsiteBasicUrl + str(i))
 
-    nrOfPbsPerPage = 25
-
-    nrPages = math.ceil(nrOfPubs/nrOfPbsPerPage)
-
-    subsites = []
-    subsiteBasicUrl = (collectElement)[:-1]
-    for i in range(1,nrPages+1):
-        subsites.append(subsiteBasicUrl + str(i))
-
-    last = nrOfPubs % 25
-    if last == 0:
-        last = 25
+        last = nrOfPubs % 25
+        if last == 0:
+            last = 25
 
 
-    fileName = collectElement.split('?')
-    fileName = fileName[0].split('/')
-    fileName = fileName[3]+'_'+fileName[4]+'_'+fileName[5]
+        fileName = collectElement.split('?')
+        fileName = fileName[0].split('/')
+        fileName = fileName[3]+'_'+fileName[4]+'_'+fileName[5]
 
-    threads = []
+        master = []
+        titles = ["id", "Nombre", "Precio", "minMet", "maxMet", "promM", "direc" ,"tipo", "lat", "lon", "dorms", "banios", "fecha", "link"]
+        master.append(titles)
 
-    master = []
-    titles = ["id", "Nombre", "Precio", "minMet", "maxMet", "promM", "direc" ,"tipo", "lat", "lon", "dorms", "banios", "fecha", "link"]
-    master.append(titles)
+        getInfo(subsites, master)
+        ctime = time.strftime("%H_%M")
+        cdate = time.strftime("%Y_%m_%d")
+        fileName += '_' + cdate + '_' + ctime
 
-    tcounter = 0
-    allLists = []
-    for i in range(0,len(subsites),step):
-        filenameNew = fileName+"_"+str(i)
-        subsites100 = subsites[i:i+step]
-        newList = []
-        allLists.append(newList)
-        thread1 = threading.Thread(target=getInfo,args=(subsites100,newList,))
-        threads.append(thread1)
+        ew.write(master, fileName)
+    cycle += 1
 
-    for thread in threads:
-        thread.start()
-
-    for thread in threads:
-        thread.join()
-
-    for sublist in allLists:
-        master = master + sublist
-
-    if oneTesting:
-        break
-
-ew.write(master, fileName)
-
-print(str(datetime.datetime.now()))
