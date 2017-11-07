@@ -75,9 +75,25 @@ def getInfo(subsites,master):
 
                 type = type[0].text
 
-                page3 = requests.get(newLink, allow_redirects=False)
+                page3 = requests.get(newLink, allow_redirects=True)
                 tree3 = html.fromstring(page3.content)
                 print(str(subsites[j]) + " " + str(j+1) + "." + str(i))
+
+                addresSite = '//*[@id="wrapper"]/section/div/div/div[1]/article/div/div[2]/div[1]/div[2]/div[1]/div/div/p[3]/span[1]'
+                address = tree3.xpath(addresSite)
+                if len(address) == 0:
+                    addresSite = '//*[@id="wrapper"]/section/div/div/div[1]/article/div/div[2]/div[2]/div[2]/div[1]/p/span[1]'
+                    address = tree3.xpath(addresSite)
+                if len(address) == 0:
+                    addresSite = '//*[@id="project-location"]/div/div/div[1]/div/div[1]/p/span[1]'
+                    address = tree3.xpath(addresSite)
+                if len(address) > 0:
+                    try:
+                        address = address[0].text
+                    except AttributeError:
+                        address = '-'
+                else:
+                    address = '-'
 
                 latSite = '/html/head/meta[18]'
                 lat = tree3.xpath(latSite)
@@ -133,19 +149,6 @@ def getInfo(subsites,master):
                     date = date[0].text
                 else:
                     date = '-'
-
-                addresSite = '//*[@id="wrapper"]/section/div/div/div[1]/article/div/div[2]/div[1]/div[2]/div[1]/div/div/p[3]/span[1]'
-                address = tree3.xpath(addresSite)
-                if len(address) == 0:
-                    addresSite = '//*[@id="wrapper"]/section/div/div/div[1]/article/div/div[2]/div[2]/div[2]/div[1]/p/span[1]'
-                    address = tree3.xpath(addresSite)
-                if len(address) > 0:
-                    try:
-                        address = address[0].text
-                    except AttributeError:
-                        address = '-'
-                else:
-                    address = '-'
 
                 aux.append(name)
                 aux.append(price)
