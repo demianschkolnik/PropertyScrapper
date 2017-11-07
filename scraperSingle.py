@@ -2,10 +2,7 @@ import math
 from lxml import html
 import requests
 import csvWrite as ew
-import coordsLoc as cl
-import re
 import datetime
-import threading
 import time
 
 print(str(datetime.datetime.now()))
