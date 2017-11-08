@@ -13,8 +13,11 @@ def getInfo(subsites,master):
 
     for j in range(0, len(subsites)):
         print(str(subsites[j])+ " page nr:" + str(j+1))
-        page2 = requests.get(subsites[j], allow_redirects=True)
-        tree2 = html.fromstring(page2.content)
+        try:
+            page2 = requests.get(subsites[j], allow_redirects=True)
+            tree2 = html.fromstring(page2.content)
+        except:
+            print("Many requests error.")
         lastRange = 25
         for i in range(1,lastRange+3):
             codeSite =  '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[1]/p[2]'
@@ -71,9 +74,11 @@ def getInfo(subsites,master):
                 meanMeters = (minMeters+maxMeters)/2.0
 
                 type = type[0].text
-
-                page3 = requests.get(newLink, allow_redirects=True)
-                tree3 = html.fromstring(page3.content)
+                try:
+                    page3 = requests.get(newLink, allow_redirects=True)
+                    tree3 = html.fromstring(page3.content)
+                except:
+                    print("Request error")
                 print(str(subsites[j]) + " " + str(j+1) + "." + str(i))
 
                 addresSite = '//*[@id="wrapper"]/section/div/div/div[1]/article/div/div[2]/div[1]/div[2]/div[1]/div/div/p[3]/span[1]'
@@ -185,9 +190,11 @@ while True:
 
 
         print("SITE:" + collectElement)
-        page2 = requests.get(collectElement, allow_redirects=True)
-        tree2 = html.fromstring(page2.content)
-
+        try:
+            page2 = requests.get(collectElement, allow_redirects=True)
+            tree2 = html.fromstring(page2.content)
+        except:
+            print("Request error")
         paginas = tree2.xpath('//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[1]/div[1]/div/div/text()[1]')
         if len(paginas) == 0:
             continue
