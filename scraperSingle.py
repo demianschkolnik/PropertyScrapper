@@ -51,7 +51,12 @@ def getInfo(subsites,master):
                 newLink = 'http://www.portalinmobiliario.com/venta/'+newLink
                 name = (name[0]).text
                 price = (price[0]).text
-
+                price=str(price)
+                price = price[2:]
+                try:
+                    price = float(price.replace('.', ''))
+                except:
+                    continue
                 if len(meters) > 0:
                     meters = meters[0].text
                 else:
@@ -63,6 +68,8 @@ def getInfo(subsites,master):
                     maxMeters = maxMeters[1:]
                     minMeters = float(minMeters.replace(',','.'))
                     maxMeters = float(maxMeters.replace(',','.'))
+
+
                 elif 'missing' in meters:
                     minMeters = -1
                     maxMeters = -1
@@ -103,6 +110,11 @@ def getInfo(subsites,master):
                     lat = str((lat[0]).attrib).split(':')
                     lat = lat[3]
                     lat = (lat[2:])[:-2]
+                    try:
+                        lat = float(lat)
+                    except:
+                        continue
+
                 else:
                     lat = -1
 
@@ -110,6 +122,10 @@ def getInfo(subsites,master):
                 lon = tree3.xpath(lonSite)
                 if len(lon) > 0:
                     lon = (((str((lon[0]).attrib).split(':'))[3])[2:])[:-2]
+                    try:
+                        lon= float(lon)
+                    except:
+                        continue
                 else:
                     lon = -1
 
@@ -152,11 +168,14 @@ def getInfo(subsites,master):
                 else:
                     date = '-'
 
+                pxm=float(price/minMeters)
+
                 aux.append(name)
                 aux.append(price)
                 aux.append(minMeters)
                 aux.append(maxMeters)
                 aux.append(meanMeters)
+                aux.append(pxm)
                 aux.append(address)
                 aux.append(type)
                 aux.append(lat)
@@ -221,7 +240,7 @@ while True:
         fileName = fileName[3]+'_'+fileName[4]+'_'+fileName[5]
 
         master = []
-        titles = ["id", "Nombre", "Precio", "minMet", "maxMet", "promM", "direc" ,"tipo", "lat", "lon", "dorms", "banios", "fecha", "link"]
+        titles = ["id", "Nombre", "Precio", "minMet", "maxMet", "promM","Precio/m2", "direc" ,"tipo", "lat", "lon", "dorms", "banios", "fecha", "link"]
         master.append(titles)
 
         getInfo(subsites, master)
