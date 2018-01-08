@@ -134,7 +134,9 @@ def getInfo(subsites,master):
 
                 try:
                     if len(dorms) > 0:
-                        dorms = dorms[0].text
+
+                        dorms=str(dorms)
+                        dorms=dorms[2]
                     else:
                         dormSite = '//*[@id="project-features"]/div/div/div[2]/span[2]/em'
                         dorms = tree3.xpath(dormSite)
@@ -150,12 +152,14 @@ def getInfo(subsites,master):
 
                 try:
                     if len(baths) > 0:
-                        baths = baths[0].text
+                        baths = str(baths)
+                        baths = baths[2]
                     else:
                         bathSite = '//*[@id="project-features"]/div/div/div[3]/span[2]/em'
                         baths = tree3.xpath(bathSite)
                         if len(baths) > 0:
                             baths = baths[0].text
+
                         else:
                             baths = '-'
                 except AttributeError:
@@ -165,6 +169,7 @@ def getInfo(subsites,master):
                 date = tree3.xpath(dateSite)
                 if len(date) > 0:
                     date = date[0].text
+                    date=date[11:]
                 else:
                     date = '-'
 
