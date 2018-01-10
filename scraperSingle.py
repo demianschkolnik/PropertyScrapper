@@ -81,6 +81,7 @@ def getInfo(subsites,master):
                 meanMeters = (minMeters+maxMeters)/2.0
 
                 type = type[0].text
+                type=type[:-1]
                 try:
                     page3 = requests.get(newLink, allow_redirects=True)
                     tree3 = html.fromstring(page3.content)
@@ -110,6 +111,7 @@ def getInfo(subsites,master):
                     lat = str((lat[0]).attrib).split(':')
                     lat = lat[3]
                     lat = (lat[2:])[:-2]
+
                     try:
                         lat = float(lat)
                     except:
@@ -137,11 +139,14 @@ def getInfo(subsites,master):
 
                         dorms=str(dorms)
                         dorms=dorms[2]
+                        dorms=float(dorms)
                     else:
                         dormSite = '//*[@id="project-features"]/div/div/div[2]/span[2]/em'
                         dorms = tree3.xpath(dormSite)
                         if len(dorms) > 0:
                             dorms = dorms[0].text
+                            dorms =dorms[0]
+                            dorms = float(dorms)
                         else:
                             dorms = '-'
                 except AttributeError:
@@ -154,12 +159,14 @@ def getInfo(subsites,master):
                     if len(baths) > 0:
                         baths = str(baths)
                         baths = baths[2]
+                        baths = float(baths)
                     else:
                         bathSite = '//*[@id="project-features"]/div/div/div[3]/span[2]/em'
                         baths = tree3.xpath(bathSite)
                         if len(baths) > 0:
                             baths = baths[0].text
-
+                            baths = baths [0]
+                            baths = float(baths)
                         else:
                             baths = '-'
                 except AttributeError:
@@ -197,7 +204,7 @@ collection = []
 for n1 in ['venta','arriendo']:
     #'casa','departamento','oficina','sitio','comercial','agricola','loteo','bodega','parcela','estacionamiento','terreno-en-construcción'
     for n2 in ['departamento','casa']:
-        for n3 in ['arica-y-parinacota','tarapaca','antofagasta','atacama','coquimbo','bernardo-ohiggins','maule','biobio','la-araucania','de-los-rios','los-lagos','aysen','magallanes-y-antartica-chilena','valparaiso','metropolitana']:
+        for n3 in ['arica-y-parinacota','metropolitana','tarapaca','antofagasta','atacama','coquimbo','bernardo-ohiggins','maule','biobio','la-araucania','de-los-rios','los-lagos','aysen','magallanes-y-antartica-chilena','valparaiso']:
             collection.append("http://www.portalinmobiliario.com/"+n1+"/"+n2+"/"+n3+"?tp=6&op=2&ca=3&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=1&sf=0&sp=0&pg=1")
 
 cycle = 0
