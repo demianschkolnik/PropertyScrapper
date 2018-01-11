@@ -4,14 +4,26 @@ import requests
 import csvWrite as ew
 import datetime
 import time
+import numpy as np
+import sqlite3
+
+coneccion=sqlite3.connect(C:\Users\CHRISTIAN\Documents\GitHub\PropertyScrapper\sqlite3\test.sqlite3)
 
 print(str(datetime.datetime.now()))
 
-step = 1
 
+
+#Matrix=np.r_[["id", "Nombre", "Precio", "minMet", "maxMet", "promM","Precio/m2", "direc" ,"tipo", "lat", "lon", "dorms", "banios", "fecha", "link"]]
+
+a=0
+step = 1
+Matrix=np.zeros((1,15))
 def getInfo(subsites,master):
 
     for j in range(0, len(subsites)):
+        global Matrix
+
+
         print(str(subsites[j])+ " page nr:" + str(j+1))
         try:
             page2 = requests.get(subsites[j], allow_redirects=True)
@@ -20,6 +32,14 @@ def getInfo(subsites,master):
             print("Many requests error.")
         lastRange = 25
         for i in range(1,lastRange+3):
+
+            global a
+
+
+
+
+
+
             codeSite =  '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[1]/p[2]'
             nameSite =  '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[1]/h4/a'
             priceSite = '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[2]/p/span'
@@ -45,6 +65,7 @@ def getInfo(subsites,master):
                     code = (code[0]).text
                 code = int(code[8:])
                 aux.append(code)
+                Matrix[a,0]=code
                 newLink = str((name[0]).attrib)
                 newLink = newLink[17:]
                 newLink = newLink[:-4]
@@ -88,6 +109,7 @@ def getInfo(subsites,master):
                 except:
                     print("Request error")
                 print(str(subsites[j]) + " " + str(j+1) + "." + str(i))
+
 
                 addresSite = '//*[@id="wrapper"]/section/div/div/div[1]/article/div/div[2]/div[1]/div[2]/div[1]/div/div/p[3]/span[1]'
                 address = tree3.xpath(addresSite)
@@ -183,20 +205,37 @@ def getInfo(subsites,master):
                 pxm=float(price/minMeters)
 
                 aux.append(name)
+
                 aux.append(price)
+                Matrix[a, 1] = price
                 aux.append(minMeters)
+                Matrix[a, 2] = minMeters
                 aux.append(maxMeters)
+                Matrix[a, 3] = maxMeters
                 aux.append(meanMeters)
+                Matrix[a, 4] = meanMeters
                 aux.append(pxm)
+                Matrix[a, 5] = pxm
                 aux.append(address)
+
                 aux.append(type)
+
                 aux.append(lat)
+                Matrix[a, 6] = lat
                 aux.append(lon)
+                Matrix[a, 7] = lon
                 aux.append(dorms)
+                Matrix[a, 8] = dorms
                 aux.append(baths)
+                Matrix[a, 9] = baths
                 aux.append(date)
+
                 aux.append(newLink)
+
                 master.append(aux)
+                a=a+1
+                Matrix = np.r_[Matrix, np.zeros((1, 15))]
+
             else:
                 print("ERROR")
 
@@ -204,7 +243,9 @@ collection = []
 for n1 in ['venta','arriendo']:
     #'casa','departamento','oficina','sitio','comercial','agricola','loteo','bodega','parcela','estacionamiento','terreno-en-construcción'
     for n2 in ['departamento','casa']:
-        for n3 in ['arica-y-parinacota','metropolitana','tarapaca','antofagasta','atacama','coquimbo','bernardo-ohiggins','maule','biobio','la-araucania','de-los-rios','los-lagos','aysen','magallanes-y-antartica-chilena','valparaiso']:
+        #for n3 in ['arica-y-parinacota','metropolitana','tarapaca','antofagasta','atacama','coquimbo','bernardo-ohiggins','maule','biobio','la-araucania','de-los-rios','los-lagos','aysen','magallanes-y-antartica-chilena','valparaiso']:
+        for n3 in ['arica-y-parinacota']:
+
             collection.append("http://www.portalinmobiliario.com/"+n1+"/"+n2+"/"+n3+"?tp=6&op=2&ca=3&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=1&sf=0&sp=0&pg=1")
 
 cycle = 0
@@ -261,5 +302,8 @@ while True:
         fileName += '_' + cdate + '_' + ctime
 
         ew.write(master, fileName)
-    cycle += 1
+        ew.write(Matrix, fileName+"v2")
+        print(Matrix)
+
+    #cycle += 1
 
