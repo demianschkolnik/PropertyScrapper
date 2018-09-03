@@ -1,28 +1,17 @@
 import math
 from lxml import html
 import requests
-import csvWrite as ew
+#import csvWrite as ew
 import datetime
 import time
-import numpy as np
-import sqlite3
-
-coneccion=sqlite3.connect(C:\Users\CHRISTIAN\Documents\GitHub\PropertyScrapper\sqlite3\test.sqlite3)
 
 print(str(datetime.datetime.now()))
 
-
-
-#Matrix=np.r_[["id", "Nombre", "Precio", "minMet", "maxMet", "promM","Precio/m2", "direc" ,"tipo", "lat", "lon", "dorms", "banios", "fecha", "link"]]
-
-a=0
 step = 1
-Matrix=np.zeros((1,15))
+
 def getInfo(subsites,master):
 
     for j in range(0, len(subsites)):
-        global Matrix
-
 
         print(str(subsites[j])+ " page nr:" + str(j+1))
         try:
@@ -34,11 +23,6 @@ def getInfo(subsites,master):
         for i in range(1,lastRange+3):
 
             global a
-
-
-
-
-
 
             codeSite =  '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[1]/p[2]'
             nameSite =  '//*[@id="wrapper"]/section[2]/div/div/div[1]/article/div[3]/div[' + str(i) + ']/div[2]/div/div[1]/h4/a'
@@ -65,7 +49,7 @@ def getInfo(subsites,master):
                     code = (code[0]).text
                 code = int(code[8:])
                 aux.append(code)
-                Matrix[a,0]=code
+
                 newLink = str((name[0]).attrib)
                 newLink = newLink[17:]
                 newLink = newLink[:-4]
@@ -207,34 +191,27 @@ def getInfo(subsites,master):
                 aux.append(name)
 
                 aux.append(price)
-                Matrix[a, 1] = price
                 aux.append(minMeters)
-                Matrix[a, 2] = minMeters
                 aux.append(maxMeters)
-                Matrix[a, 3] = maxMeters
                 aux.append(meanMeters)
-                Matrix[a, 4] = meanMeters
                 aux.append(pxm)
-                Matrix[a, 5] = pxm
                 aux.append(address)
 
                 aux.append(type)
 
                 aux.append(lat)
-                Matrix[a, 6] = lat
                 aux.append(lon)
-                Matrix[a, 7] = lon
                 aux.append(dorms)
-                Matrix[a, 8] = dorms
                 aux.append(baths)
-                Matrix[a, 9] = baths
                 aux.append(date)
 
                 aux.append(newLink)
 
+                print(aux)
+
                 master.append(aux)
-                a=a+1
-                Matrix = np.r_[Matrix, np.zeros((1, 15))]
+                #a=a+1
+                #Matrix = np.r_[Matrix, np.zeros((1, 15))]
 
             else:
                 print("ERROR")
@@ -301,9 +278,9 @@ while True:
         cdate = time.strftime("%Y_%m_%d")
         fileName += '_' + cdate + '_' + ctime
 
-        ew.write(master, fileName)
-        ew.write(Matrix, fileName+"v2")
-        print(Matrix)
+        #ew.write(master, fileName)
+        #ew.write(Matrix, fileName+"v2")
+        #print(Matrix)
 
     #cycle += 1
 
